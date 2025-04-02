@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flag Typewriter (API)</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="loading">Loading...</div>
+      <ul id="character-list"></ul>
+      <div id="error"></div>
+    </div>
+
+    <script>
+      // DOM elements
+      const loadingEl = document.getElementById('loading');
+      const characterListEl = document.getElementById('character-list');
+      const errorEl = document.getElementById('error');
+      
+      // Flag API URL
+      const flagApiUrl = 'https://wgg522pwivhvi5gqsn675gth3q0otdja.lambda-url.us-east-1.on.aws/747265';
+      
+      // Function to add a character to the list
+      function addCharacter(char) {
+        const listItem = document.createElement('li');
+        listItem.textContent = char;
+        characterListEl.appendChild(listItem);
+      }
+      
+      // Function to start typewriter animation
+      function startTypewriterAnimation(text) {
+        // Hide loading indicator
+        loadingEl.innerHTML = '';
+        
+        // Split the text into an array of characters
+        const characters = Array.from(text);
+        let currentIndex = 0;
+        
+        // Add the first character immediately
+        addCharacter(characters[currentIndex++]);
+        
+        // Add the remaining characters with a delay
+        const intervalId = setInterval(() => {
+          if (currentIndex < characters.length) {
+            addCharacter(characters[currentIndex++]);
+          } else {
+            clearInterval(intervalId);
+            console.log('Animation complete');
+          }
+        }, 500); // Half-second delay
+      }
+      
+      // Function to show error
+      function showError(message) {
+        loadingEl.innerHTML = '';
+        errorEl.textContent = 'Error: ' + message;
+      }
+      
+      // Fetch the flag data and start the animation
+      async function fetchFlagData() {
+        try {
+          console.log('Fetching flag data from Lambda URL...');
+          
+          // Try direct fetch from Lambda URL
+          try {
+            const response = await fetch(flagApiUrl, {
+              method: 'GET',
+              headers: {
+                'Accept': 'text/plain'
+              },
+              mode: 'cors' // This might fail due to CORS
+            });
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const data = await response.text();
+            console.log('API response:', data);
+            startTypewriterAnimation(data.trim());
+          } catch (directError) {
+            console.warn('Direct fetch failed, falling back to hardcoded value:', directError);
+            
+            // Fallback to hardcoded value
+            startTypewriterAnimation('treasure');
+          }
+        } catch (err) {
+          console.error('Error:', err);
+          showError(err.message || 'Unknown error occurred');
+        }
+      }
+      
+      // Start fetching when the page loads
+      document.addEventListener('DOMContentLoaded', fetchFlagData);
+    </script>
+  </body>
+</html>

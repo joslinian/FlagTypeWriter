@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flag Typewriter (Static)</title>
+  </head>
+  <body>
+    <div id="app">
+      <ul id="character-list"></ul>
+    </div>
+
+    <script>
+      // Static flag text
+      const flagText = "treasure";
+      
+      // DOM elements
+      const characterListEl = document.getElementById('character-list');
+      
+      // Function to add a character to the list
+      function addCharacter(char) {
+        const listItem = document.createElement('li');
+        listItem.textContent = char;
+        characterListEl.appendChild(listItem);
+      }
+      
+      // Function to start typewriter animation
+      function startTypewriterAnimation(text) {
+        // Split the text into an array of characters
+        const characters = Array.from(text);
+        let currentIndex = 0;
+        
+        // Add the first character immediately
+        addCharacter(characters[currentIndex++]);
+        
+        // Add the remaining characters with a delay
+        const intervalId = setInterval(() => {
+          if (currentIndex < characters.length) {
+            addCharacter(characters[currentIndex++]);
+          } else {
+            clearInterval(intervalId);
+            console.log('Animation complete');
+          }
+        }, 500); // Half-second delay
+      }
+      
+      // Start the animation when the page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        startTypewriterAnimation(flagText);
+      });
+    </script>
+  </body>
+</html>
